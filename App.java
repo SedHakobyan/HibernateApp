@@ -10,7 +10,9 @@ import org.hibernate.service.ServiceRegistry;
 
 import javax.persistence.EntityManager;
 import java.sql.Timestamp;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class App {
 
@@ -52,7 +54,7 @@ public class App {
                   +    "     amnappo.address_data      ad,"
                   +     "     amnappo.name_data         nd"
 
-                  + " where  trunc(s.EFFECTIVE_DATE)=trunc(sysdate-90)"
+                  + " where  trunc(s.EFFECTIVE_DATE)=trunc(sysdate-210)"
                   + " and anl.ban=s.customer_id"
                   + " and anl.expiration_date is null"
                   + " and anl.link_type = 'T'"
@@ -61,7 +63,7 @@ public class App {
                   + " and s.customer_id=sf.ban"
                   + " and s.subscriber_no=sf.subscriber_no"
                   + " and s.sub_status_rsn_code ='CO'"
-                  + " and  trunc(sf.ftr_expiration_date)=trunc(sysdate-90)"
+                  + " and  trunc(sf.ftr_expiration_date)=trunc(sysdate-210)"
                   + " and sf.feature_code = 'FLPORT'"
                   + " and s.SUB_STATUS_LAST_ACT ='CAN'"
                   + " and  (s.product_code='DWLN' or s.product_code='AWLN')"
@@ -69,29 +71,42 @@ public class App {
                   + " and ds.dvc_tp='ate'";
           Timestamp popo = null;
 
-         // List<Object[]> tab1 =  session.createNativeQuery(select).list();
-         // System.out.println("erkarutyuyn = "+ tab1.size());
-       //   for (Object[] tab : tab1) {
+          List<Object[]> tab1 =  session.createNativeQuery(select).list();
+          System.out.println("erkarutyuyn = "+ tab1.size());
+
+          ExcelWriter send = new ExcelWriter();
+         // send.SaveToFile(tab1);
+          List<Subscriber> Subscribers = new ArrayList<Subscriber>();
+         for (Object[] tab : tab1) {
               //String employee= (String)tab1.get(0)[3];
-           //   Timestamp data_creat = (Timestamp)tab1.get(0)[5];
+             Subscriber sb = new Subscriber();
+             sb.setSubscriber_no((String)tab[0]);
+             sb.setSys_creation_date((Timestamp)tab[1]);
+             sb.setSubscriber((String)tab[3]);
+             sb.setAddress((String)tab[4]);
+             sb.setEffective_date((Timestamp)tab[5]);
+             sb.setAdditional_info((String)tab[6]);
+             sb.setSoc((String)tab[7]);
+             sb.setLogical_dvc_id((String)tab[8]);
+             Subscribers.add(sb);
+
            //   popo =data_creat;
-            //  Trunk emp = (Trunk) results.get(1)[0];
-          //    System.out.println("subscriber["+ data_creat +"]"+"\n");
 
-          //}
-
+          }
+          SortAndSaveExcel(Subscribers);
+          System.out.println("qanak = "+ Subscribers.size() + "subscriber 3 ["+ Subscribers.get(3).getSubscriber() +"]");
           /*String INSERT_SQL = "INSERT INTO message_log (id, message, log_dttm) VALUES(id_seq.nextval, ?, SYSDATE)";
           em.createNativeQuery(INSERT_SQL).setParameter(1, message).executeUpdate();
           */
-          String tme = "2019-10-01";
-          String INSERT_SQL = "INSERT INTO VC_TRUNKS_DOUBLE (TRUNK, MSISDN, DOUBLE,COLUMN1) VALUES('66666','Gexam',1,to_date('"+ tme +"','YYYY-MM-DD'))";
+         // String tme = "2019-10-01";
+         // String INSERT_SQL = "INSERT INTO VC_TRUNKS_DOUBLE (TRUNK, MSISDN, DOUBLE,COLUMN1) VALUES('66666','Gexam',1,to_date('"+ tme +"','YYYY-MM-DD'))";
           //session.createNativeQuery(INSERT_SQL).executeUpdate();
 
-          transaction.commit();
+         // transaction.commit();
 
-         session2 = hib.getSessionFromcnf("hibernate-crm.cfg.xml");
-          transaction = session2.beginTransaction();
-          session2.createNativeQuery(INSERT_SQL).executeUpdate();
+       //  session2 = hib.getSessionFromcnf("hibernate-crm.cfg.xml");
+         // transaction = session2.beginTransaction();
+         // session2.createNativeQuery(INSERT_SQL).executeUpdate();
 
           transaction.commit();
 
@@ -107,4 +122,58 @@ public class App {
       }
     }
 
+  static   String getSubscrString(Subscriber s){
+
+
+
+          if(s.getSubscriber().trim().startsWith(YEREVAN_PREFIX)) return YEREVAN_PREFIX;
+          return s.getSubscriber().substring(0, 5);
+    }
+
+    private static  Map<String, List<Subscriber>> SortAndSaveMap(List<Subscriber> sb) {
+     /*   List<Subscriber> yerevan_subscribers = new ArrayList<Subscriber>();
+        Map<String, List<Subscriber>> myMap = new HashMap<String, List <Subscriber>>();
+        List<Subscriber> living = new ArrayList<Subscriber>();
+        String prefix;
+        for(Subscriber lis : sb){
+
+            if (lis.getSubscriber().trim().startsWith("YEREVAN_PREFIX"))
+                myMap.put(YEREVAN_PREFIX, yerevan_subscribers);
+            else {
+                 prefix = lis.getSubscriber().trim().substring(0,5);
+                if (myMap.containsKey(prefix)) {
+                    living = myMap.get(prefix);
+                    living.add(lis);
+
+                }
+             else {
+                        List<Subscriber> nor = new ArrayList<Subscriber>();
+                        nor.add(lis);
+                        myMap.put(prefix, nor);
+
+                }
+            }
+*/
+     Map<String,List<Subscriber>> result=  sb.stream()
+                  .collect(Collectors.groupingBy(App::getSubscrString));
+     
+            return result;
+
+        }
+
+
+
+        //saveListToFile(entry);
+        Iterator<Map.Entry<String, List<Subscriber>>> entries = myMap.entrySet().iterator();
+        while (entries.hasNext()) {
+
+            Map.Entry<String, List<Subscriber>> entry = entries.next();
+           // saveListToFile(entry);
+
+        }
+
+    }
+
+
+private static String YEREVAN_PREFIX="7410";
 }

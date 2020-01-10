@@ -35,11 +35,8 @@ public class HibernateUtil {
             t.printStackTrace();
         }
 
-
         return retSession;
 
     }
-
-
 
 }
