@@ -1,179 +1,113 @@
 package com.bee.am;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.service.ServiceRegistry;
-
-
-import javax.persistence.EntityManager;
-import java.sql.Timestamp;
+import org.apache.log4j.Logger;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-
 public class App {
-
-    public void whenNamedQuery_thenMultipleEntityResult() {
-     EntityManager em;
-
-
-    }
-    public static void main (String [] as)
+    private static final Logger log = Logger.getLogger(App.class);
+   protected HashMap<String, String> CaseStatMap =new HashMap<String,String>();
+   protected void setCaseStatMap(String key,String value){
+       CaseStatMap.put(key,value);
+   }
+    App()
     {
-        Session session = null;
-        Session session2 =null;
-        Transaction transaction = null;
-
-      try {
-          HibernateUtil hib = new HibernateUtil();
-         session = hib.getSessionFromcnf("hibernate-ararat.cfg.xml");
-          //Configuration configuration = new Configuration();
-         // configuration.configure("hibernate-crm.cfg.xml");
-         // configuration.addAnnotatedClass(Employee.class);
-        //  ServiceRegistry srvcReg = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
-        //  SessionFactory sessionFactory = configuration.buildSessionFactory(srvcReg);
-         // session = sessionFactory.openSession();
-         transaction = session.beginTransaction();
-
-          //Native query selecting all columns
-          //List<Object[]> tab1 =  session.createNativeQuery("select a.MSC, a.TRUNK, b.MSCID, a.PORT_TYPE,b.TYPE from VC_SMSC_PARTNER_TRUNK a,  VC_TRUNKS b where a.TRUNK = b.TRUNK").list();
-    String test = "'"+"aaaa"+"||";
-          System.out.println("test string = " + test);
-
-          String select = " select distinct(s.subscriber_no),s.SYS_CREATION_DATE,s.sub_status_rsn_code ,"
-                  + " nd.last_business_name  || ' ' ||rtrim(nd.first_name)as bajanord,"
-                  + " rtrim(ad.adr_place_type)|| ' ' || rtrim(ad.adr_city) || '  ' ||"
-                  + " rtrim(ad.adr_primary_ln)|| ' ' ||rtrim(ad.adr_street_type)|| ' ' ||"
-                  + " rtrim(ad.adr_house_no) || '  ' || rtrim(ad.adr_apt_type)|| ' ' ||ad.adr_apt_nm as hasce,"
-                  + " s.effective_date ,sf.additional_info , sf.soc ,ds.logical_dvc_id"
-                  +  "    from amnappo.subscriber s ,amnrefwork.logic_devs ds ,amnappo.service_feature sf ,"
-                  +   "      amnappo.address_name_link anl,"
-                  +    "     amnappo.address_data      ad,"
-                  +     "     amnappo.name_data         nd"
-
-                  + " where  trunc(s.EFFECTIVE_DATE)=trunc(sysdate-210)"
-                  + " and anl.ban=s.customer_id"
-                  + " and anl.expiration_date is null"
-                  + " and anl.link_type = 'T'"
-                  + " and ad.address_id=anl.address_id"
-                  + " and nd.name_id=anl.name_id"
-                  + " and s.customer_id=sf.ban"
-                  + " and s.subscriber_no=sf.subscriber_no"
-                  + " and s.sub_status_rsn_code ='CO'"
-                  + " and  trunc(sf.ftr_expiration_date)=trunc(sysdate-210)"
-                  + " and sf.feature_code = 'FLPORT'"
-                  + " and s.SUB_STATUS_LAST_ACT ='CAN'"
-                  + " and  (s.product_code='DWLN' or s.product_code='AWLN')"
-                  + " and to_number(s.subscriber_no) between ds.FROM_NO and ds.TO_NO"
-                  + " and ds.dvc_tp='ate'";
-          Timestamp popo = null;
-
-          List<Object[]> tab1 =  session.createNativeQuery(select).list();
-          System.out.println("erkarutyuyn = "+ tab1.size());
-
-          ExcelWriter send = new ExcelWriter();
-         // send.SaveToFile(tab1);
-          List<Subscriber> Subscribers = new ArrayList<Subscriber>();
-         for (Object[] tab : tab1) {
-              //String employee= (String)tab1.get(0)[3];
-             Subscriber sb = new Subscriber();
-             sb.setSubscriber_no((String)tab[0]);
-             sb.setSys_creation_date((Timestamp)tab[1]);
-             sb.setSubscriber((String)tab[3]);
-             sb.setAddress((String)tab[4]);
-             sb.setEffective_date((Timestamp)tab[5]);
-             sb.setAdditional_info((String)tab[6]);
-             sb.setSoc((String)tab[7]);
-             sb.setLogical_dvc_id((String)tab[8]);
-             Subscribers.add(sb);
-
-           //   popo =data_creat;
-
-          }
-          SortAndSaveExcel(Subscribers);
-          System.out.println("qanak = "+ Subscribers.size() + "subscriber 3 ["+ Subscribers.get(3).getSubscriber() +"]");
-          /*String INSERT_SQL = "INSERT INTO message_log (id, message, log_dttm) VALUES(id_seq.nextval, ?, SYSDATE)";
-          em.createNativeQuery(INSERT_SQL).setParameter(1, message).executeUpdate();
-          */
-         // String tme = "2019-10-01";
-         // String INSERT_SQL = "INSERT INTO VC_TRUNKS_DOUBLE (TRUNK, MSISDN, DOUBLE,COLUMN1) VALUES('66666','Gexam',1,to_date('"+ tme +"','YYYY-MM-DD'))";
-          //session.createNativeQuery(INSERT_SQL).executeUpdate();
-
-         // transaction.commit();
-
-       //  session2 = hib.getSessionFromcnf("hibernate-crm.cfg.xml");
-         // transaction = session2.beginTransaction();
-         // session2.createNativeQuery(INSERT_SQL).executeUpdate();
-
-          transaction.commit();
-
-
-      }
-      catch (Exception e) {
-          e.printStackTrace();
-      } finally {
-          if (session != null) {
-              session.close();
-          }
-         // session2.close();
-      }
+        File mapFile = new File(Fileutils.ftpResources.getString("case_map_file"));
+        loadExcelLines(mapFile);
     }
-
-  static   String getSubscrString(Subscriber s){
-
-
-
-          if(s.getSubscriber().trim().startsWith(YEREVAN_PREFIX)) return YEREVAN_PREFIX;
-          return s.getSubscriber().substring(0, 5);
-    }
-
-    private static  Map<String, List<Subscriber>> SortAndSaveMap(List<Subscriber> sb) {
-     /*   List<Subscriber> yerevan_subscribers = new ArrayList<Subscriber>();
-        Map<String, List<Subscriber>> myMap = new HashMap<String, List <Subscriber>>();
-        List<Subscriber> living = new ArrayList<Subscriber>();
-        String prefix;
-        for(Subscriber lis : sb){
-
-            if (lis.getSubscriber().trim().startsWith("YEREVAN_PREFIX"))
-                myMap.put(YEREVAN_PREFIX, yerevan_subscribers);
-            else {
-                 prefix = lis.getSubscriber().trim().substring(0,5);
-                if (myMap.containsKey(prefix)) {
-                    living = myMap.get(prefix);
-                    living.add(lis);
-
+    private void loadExcelLines(File fileName)
+    {
+        // Used the LinkedHashMap and LikedList to maintain the order
+        HashMap<String, LinkedHashMap<Integer, List>> outerMap = new LinkedHashMap<String, LinkedHashMap<Integer, List>>();
+        LinkedHashMap<String, List> hashMap = new LinkedHashMap<String, List>();
+        String sheetName = null;
+        // Create an ArrayList to store the data read from excel sheet.
+        // List sheetData = new ArrayList();
+        FileInputStream fis = null;
+        try
+        {
+            fis = new FileInputStream(fileName);
+            // Create an excel workbook from the file system
+            XSSFWorkbook workBook = new XSSFWorkbook(fis);
+            // Get the first sheet on the workbook.
+            XSSFSheet sheet = workBook.getSheetAt(0);
+            // XSSFSheet sheet = workBook.getSheetAt(0);
+            sheetName = workBook.getSheetName(0);
+            Iterator rows = sheet.rowIterator();
+            String prefix ="";
+            while (rows.hasNext())
+            {
+                XSSFRow row = (XSSFRow) rows.next();
+                Iterator cells = row.cellIterator();
+                List data = new LinkedList();
+                while (cells.hasNext())
+                {
+                    XSSFCell cell = (XSSFCell) cells.next();
+                    data.add(cell);
                 }
-             else {
-                        List<Subscriber> nor = new ArrayList<Subscriber>();
-                        nor.add(lis);
-                        myMap.put(prefix, nor);
 
+                hashMap.put(row.getCell(0).getRawValue(), data);
+                // sheetData.add(data);
+            }
+            //  outerMap.put(sheetName, hashMap);
+            // hashMap = new LinkedHashMap<Integer, List>();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            if (fis != null)
+            {
+                try
+                {
+                    fis.close();
+                }
+                catch (IOException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
             }
-*/
-     Map<String,List<Subscriber>> result=  sb.stream()
-                  .collect(Collectors.groupingBy(App::getSubscrString));
-     
-            return result;
-
         }
-
-
-
-        //saveListToFile(entry);
-        Iterator<Map.Entry<String, List<Subscriber>>> entries = myMap.entrySet().iterator();
-        while (entries.hasNext()) {
-
-            Map.Entry<String, List<Subscriber>> entry = entries.next();
-           // saveListToFile(entry);
-
-        }
-
+        CaseMap= hashMap;
     }
-
-
-private static String YEREVAN_PREFIX="7410";
+    public void startCProcess(String act)
+    {
+        log.info("START " + act + " PROCESS !!!");
+        CaseProcess cp = new CaseProcess();
+        cp.get_Act_for_case(act);
+    }
+    public static HashMap gettestMap() { return CaseMap;}
+    public static String getcasename (Object key , String event)
+    {
+        String case_name = null;
+        LinkedList qname = (LinkedList)CaseMap.get(key);
+        switch (event) {
+            case "DEL":
+                case_name=qname.get(4).toString(); //title delete;
+                break;
+            case "SUS": case_name=qname.get(5).toString(); //title cansel;
+                break;
+            case "RES":case_name=qname.get(6).toString();//title resume;
+                break;
+            default:
+                break;
+        }
+        return UnicodeToARMCyr.UToARMCyr((case_name));
+    }
+    public void _flushErrorCases(){CaseProcess cp = new CaseProcess(); cp._collectErrorCases();}
+    private static HashMap CaseMap;
+    public static void main(String[] as) {
+        App pp = new App();
+        System.out.println("!!! Start Auto Provis !!!");
+     pp.startCProcess("SUS"); //TasksGenerator Task = new TasksGenerator();
+       // pp._flushErrorCases();
+    }
 }
