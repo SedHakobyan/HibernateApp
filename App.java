@@ -1,3 +1,4 @@
+//automatic case creation program (ACCP);
 package com.bee.am;
 
 import org.apache.log4j.Logger;
@@ -102,12 +103,34 @@ public class App {
         }
         return UnicodeToARMCyr.UToARMCyr((case_name));
     }
+
+    /* for check case name
+    public  String testCaseName (Object key , String event)
+    {
+        String case_name = null;
+        LinkedList qname = (LinkedList)CaseMap.get(key);
+        switch (event) {
+            case "DEL":
+                case_name=qname.get(4).toString(); //title delete;
+                break;
+            case "SUS": case_name=qname.get(5).toString(); //title cansel;
+                break;
+            case "RES":case_name=qname.get(6).toString();//title resume;
+                break;
+            default:
+                break;
+        }
+        return UnicodeToARMCyr.UToARMCyr((case_name));
+    }
+    */
+
     public void _flushErrorCases(){CaseProcess cp = new CaseProcess(); cp._collectErrorCases();}
     private static HashMap CaseMap;
     public static void main(String[] as) {
-        App pp = new App();
+       // App pp = new App();
         System.out.println("!!! Start Auto Provis !!!");
-     pp.startCProcess("SUS"); //TasksGenerator Task = new TasksGenerator();
-       // pp._flushErrorCases();
+        // pp.startCProcess("DEL"); //TasksGenerator Task = new TasksGenerator();
+   //System.out.println("case name =" + pp.gettest( "74312","DEL"));
+       TasksGenerator Task = new TasksGenerator();
     }
 }

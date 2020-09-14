@@ -1,3 +1,4 @@
+// run thask in time 9:00 pm
 package com.bee.am;
 
 import org.apache.log4j.Logger;
@@ -11,9 +12,7 @@ public class TasksGenerator {
     {
         _myApp = new App();
         initTasks();
-
     }
-
     private void initTasks() {
         log.info("Task scheduler launched ...");
         TimerTask task1 = new DeleteTask();
@@ -21,10 +20,10 @@ public class TasksGenerator {
         TimerTask task3 = new ResumeTask();
         TimerTask task4 = new ErrorCollectorTask();
         Timer timer = new Timer();
-        timer.schedule(task1, 420000, TimeUnit.MILLISECONDS.convert(1, TimeUnit.MINUTES));
-        timer.schedule(task2, 0, TimeUnit.MILLISECONDS.convert(3, TimeUnit.MINUTES));
-        timer.schedule(task3, 0, TimeUnit.MILLISECONDS.convert(5, TimeUnit.MINUTES));
-        timer.schedule(task4,0,  TimeUnit.MILLISECONDS.convert(10, TimeUnit.MINUTES));
+        timer.schedule(task1, 0, TimeUnit.MILLISECONDS.convert(24, TimeUnit.HOURS)); //delay = 25200000; 7 hours;
+        timer.schedule(task2, 3600000, TimeUnit.MILLISECONDS.convert(24, TimeUnit.HOURS)); //delay = 18000000; 5 hours;
+        timer.schedule(task3, 7200000, TimeUnit.MILLISECONDS.convert(24, TimeUnit.HOURS)); // delay =  21600000; 6 hours;
+        timer.schedule(task4,25200000,  TimeUnit.MILLISECONDS.convert(24, TimeUnit.HOURS)); // delay = 36000000; 10 hours;
     }
     class DeleteTask extends TimerTask {
         public void run() {
@@ -35,9 +34,9 @@ public class TasksGenerator {
     }
     class SuspendTask extends TimerTask {
         public void run() {
-            log.info("cancel_case task is starting ...");
+            log.info("suspend_case task is starting ...");
             _myApp.startCProcess("SUS");
-            log.info("cancel_case task is finish !!!");
+            log.info("suspend_case task is finish !!!");
         }
     }
 
@@ -57,5 +56,4 @@ public class TasksGenerator {
   }
     private static final Logger log = Logger.getLogger(TasksGenerator.class);
     private App _myApp;
-
 }

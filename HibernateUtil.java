@@ -23,8 +23,7 @@ public class HibernateUtil {
             +    "     amnappo.address_data      ad,"
             +     "     amnappo.name_data         nd"
 
-            + " where  trunc(s.EFFECTIVE_DATE)>=trunc(sysdate-16)"
-            + " and s.subscriber_no ='7424453566'"
+            + " where  trunc(s.EFFECTIVE_DATE)=trunc(sysdate-90)"
             + " and anl.ban=s.customer_id"
             + " and anl.expiration_date is null"
             + " and anl.link_type = 'T'"
@@ -33,7 +32,7 @@ public class HibernateUtil {
             + " and s.customer_id=sf.ban"
             + " and s.subscriber_no=sf.subscriber_no"
             + " and s.sub_status_rsn_code ='CO'"
-            + " and  trunc(sf.ftr_expiration_date)>=trunc(sysdate-16)"
+            + " and  trunc(sf.ftr_expiration_date)=trunc(sysdate-90)"
             + " and sf.feature_code = 'FLPORT'"
             + " and s.SUB_STATUS_LAST_ACT ='CAN'"
             + " and  (s.product_code='DWLN' or s.product_code='AWLN')"
@@ -51,7 +50,7 @@ public class HibernateUtil {
             +   "     amnappo.address_name_link anl,"
             +    "    amnappo.address_data      ad,"
             +    "    amnappo.name_data         nd"
-            + " where  trunc(s.EFFECTIVE_DATE)>=trunc(sysdate-10)"
+            + " where  trunc(s.EFFECTIVE_DATE)>=trunc(sysdate-1)"
             + " and anl.ban=s.customer_id"
             + " and anl.expiration_date is null"
             + " and anl.link_type = 'T'"
@@ -94,7 +93,7 @@ public class HibernateUtil {
             + "and  (s.product_code='DWLN' or s.product_code='AWLN') "
             + "and to_number(s.subscriber_no) between ds.FROM_NO and ds.TO_NO "
             + "and ds.logical_dvc_id = 'ATENIL'";
-    protected static String error_LOGSelect = "select distinct(s.GROUP_TRX_SEQ_NO),s.TRX_STATUS, a.ERROR_USER_TEXT,s.SYS_CREATION_DATE "
+    protected static String error_LOGSelect = "select s.GROUP_TRX_SEQ_NO,s.TRX_STATUS, a.ERROR_USER_TEXT,s.SYS_CREATION_DATE "
                                               + "from TMPLOAD.CRMTRX_TRANSACTION_LOG s ,TMPLOAD.PROCESSTRX_ERROR_LOG a "
                                               + " where s.GROUP_TRX_SEQ_NO= a.GROUP_TRX_SEQ_NO and s.TRX_STATUS='E' and s.APPLICATION_ID = 'ACCP' and  s.SYS_CREATION_DATE like ? ";
     private static final Logger log = Logger.getLogger(HibernateUtil.class);
@@ -176,5 +175,3 @@ public class HibernateUtil {
         return res;
     }
 }
-
-

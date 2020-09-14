@@ -23,12 +23,13 @@ import java.util.stream.Collectors;
 {
     HibernateUtil hib = new HibernateUtil();
     AddMap(hib._proccessCan_Res_Sus(act));
+       // if (_myMap == null)  throw new NullPointerException("Exception: _myMap is null!");
     OpenCaseWithFile(_myMap,act);
 }
-    private void _case(Session session,String action,String que_name, String filename) {
+    private void _case(Session session,String action,String que_name, String filename, String Subscriber_no) {
             log.info("create case for "+action);
             CRMcase crmcase = new CRMcase();
-            crmcase._createCase(session,action,que_name,filename);
+            crmcase._createCase(session,action,que_name,filename,Subscriber_no);
 
     }
 
@@ -53,7 +54,7 @@ import java.util.stream.Collectors;
                         ftpobj._fileAttachmentProcess(new File(filename));
                         log.info("sleeping for 20 secs before create case...");
                         Thread.sleep(20000);
-                        _case(session,action,App.getcasename(entry.getKey(),action),filename);
+                        _case(session,action,App.getcasename(entry.getKey(),action),filename,ZeroSubscriberNo); //  entry.getValue().get(0).getSubscriber_no();
 
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -87,6 +88,10 @@ import java.util.stream.Collectors;
         }
     }
     private void   AddMap(List<Subscriber> sb) {
+       for (int i=0;i<sb.size();i++)
+       {
+           System.out.println("SB["+i+"]"+ sb.get(i).getSubscriber_no());
+       }
         _myMap = sb.stream()
                 .collect(Collectors.groupingBy(CaseProcess::getSubscr_noPrefix));
         log.info("Fill list for case!!!");
@@ -127,6 +132,7 @@ import java.util.stream.Collectors;
         }
     }
     private static String YEREVAN_PREFIX="7410";
+    private static String ZeroSubscriberNo = "0000000000";
     private Map<String, List<Subscriber>> _myMap;
     private int ev;
     protected static  ResourceBundle ftpResources = ResourceBundle.getBundle("init");
